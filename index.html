@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peer Client LimiDraw</title>
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+
+    <!-- Trunk directives -->
+    
+    
+    <!-- Rust WASM build with real progress initializer -->
+    
+<script type="module">
+async function __trunkInitializer(init, source, sourceSize, initializer, initWithObject) {
+  if (initializer === undefined) {
+    return await init(initWithObject ? { module_or_path: source } : source);
+  }
+
+  const {
+    onStart, onProgress, onComplete, onSuccess, onFailure
+  } = initializer;
+
+  onStart?.();
+
+  const response = fetch(source)
+      .then((response) => {
+        const reader = response.body.getReader();
+        const headers = response.headers;
+        const status = response.status;
+        const statusText = response.statusText;
+
+        const total = sourceSize;
+        let current = 0;
+
+        const stream = new ReadableStream({
+          start(controller) {
+            function push() {
+              reader.read().then(({done, value}) => {
+                if (done) {
+                  onProgress?.({current: total, total});
+                  controller.close();
+                  return;
+                }
+
+                current += value.byteLength;
+                onProgress?.({current, total});
+                controller.enqueue(value);
+                push();
+              });
+            }
+
+            push();
+          },
+        });
+
+        return {
+          stream, init: {
+            headers, status, statusText
+          }
+        };
+      })
+      .then(({stream, init}) =>
+          new Response(stream, init),
+      );
+
+  return init(initWithObject ? { module_or_path: response } : response)
+      .then((value) => {
+        onComplete?.();
+        onSuccess?.(value);
+        return value;
+      }, (reason) => {
+        onComplete?.();
+        onFailure?.(reason);
+        return reason;
+      });
+}
+
+
+import init, * as bindings from './assets/wasm/peer_client_limi_draw-770873559b6200ff.js';
+import initializer from './assets/wasm/7da9471a07c4b5e-initializer.mjs';
+
+const wasm = await __trunkInitializer(init, './assets/wasm/peer_client_limi_draw-770873559b6200ff_bg.wasm', 4595286, initializer(), true);
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script>
+
+    <style type="text/css">
+        /* Base styles */
+        html, body {
+            overflow: hidden;
+            margin: 0 !important;
+            padding: 0 !important;
+            height: 100%;
+            width: 100%;
+            background: #1a1a1a;
+        }
+
+        /* Canvas for egui app */
+        canvas {
+            margin-right: auto;
+            margin-left: auto;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Loading screen container */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Logo */
+        #loading-logo {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 30px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        /* Loading text */
+        #loading-text {
+            color: #e0e0e0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-size: 18px;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+        }
+
+        /* Progress bar container */
+        #progress-container {
+            width: 300px;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        /* Progress bar fill */
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #4a9eff, #00d4aa);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* Progress percentage text */
+        #progress-text {
+            color: #888;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-size: 14px;
+        }
+
+        /* Spinner for indeterminate loading */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #333;
+            border-top-color: #4a9eff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-top: 20px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+<link rel="modulepreload" href="./assets/wasm/peer_client_limi_draw-770873559b6200ff.js" crossorigin="anonymous" integrity="sha384-sdTxP8cAuELEHP2UuuZ864gohaWx3Z/6JE+07jmPz1S1jVg0Xam2f1gG1rOTswyy"><link rel="modulepreload" href="./assets/wasm/7da9471a07c4b5e-initializer.mjs" crossorigin="anonymous" integrity="sha384-//ATIFO9Ke4d14PbNjENwjRk7Ezz9sIfx7IqlYcJsOcrDWL/AYx2XZNwXftapDs3"><link rel="preload" href="./assets/wasm/peer_client_limi_draw-770873559b6200ff_bg.wasm" crossorigin="anonymous" integrity="sha384-7nOi9EAI3TQCHpX6uo6nY6x9H/Kuu42lORPN30KyId987VNecRKJVv20dR2FzAeg" as="fetch" type="application/wasm"></head>
+
+<body>
+<!-- Loading screen -->
+<div id="loading-screen">
+    <img id="loading-logo" src="./assets/images/logo.png" alt="Peer Client LimiDraw Logo"/>
+    <div id="loading-text">Loading Peer Client LimiDraw...</div>
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+    <div id="progress-text">0%</div>
+    <div class="spinner"></div>
+</div>
+
+<!-- Canvas for egui app -->
+<canvas id="canvas"></canvas>
+
+<script>
+    // hideLoadingScreen: called from Rust (wasm_bindgen) when eframe app is fully ready.
+    // The progress bar (0-90%) is driven by trunk's initializer (src/initializer.mjs)
+    // via real onProgress({current, total}) callbacks during WASM download.
+    // This function handles the final 100% and fade-out.
+    (function () {
+        "use strict";
+
+        var loadingScreen = document.getElementById("loading-screen");
+
+        window.hideLoadingScreen = function () {
+            var bar = document.getElementById("progress-bar");
+            var text = document.getElementById("progress-text");
+            var heading = document.getElementById("loading-text");
+
+            if (bar) bar.style.width = "100%";
+            if (text) text.textContent = "100%";
+            if (heading) heading.textContent = "Ready";
+
+            setTimeout(function () {
+                loadingScreen.classList.add("hidden");
+                setTimeout(function () {
+                    loadingScreen.style.display = "none";
+                }, 500);
+            }, 300);
+        };
+
+        // Fallback: if WASM never calls hideLoadingScreen, hide after timeout
+        setTimeout(function () {
+            if (!loadingScreen.classList.contains("hidden")) {
+                window.hideLoadingScreen();
+            }
+        }, 30000);
+    })();
+</script>
+</body>
+
+</html>
